@@ -2,8 +2,18 @@ import React, { useEffect, useRef } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
+import { Table } from '@tiptap/extension-table';
+import { TableRow } from '@tiptap/extension-table-row';
+import { TableCell } from '@tiptap/extension-table-cell';
+import { TableHeader } from '@tiptap/extension-table-header';
+import { CodeBlockLowlight } from '@tiptap/extension-code-block-lowlight';
+import { common, createLowlight } from 'lowlight';
 import { useStore } from '../store';
 import { MoreHorizontal, Bold, Italic, Strikethrough, Heading1, Heading2, List, ListOrdered, Code, Quote, ArrowLeft } from 'lucide-react';
+import { MarkdownPaste } from '../extensions/MarkdownPaste';
+
+// 创建 lowlight 实例，支持常用语言高亮
+const lowlight = createLowlight(common);
 
 export const Editor: React.FC = () => {
   const { currentChapter, updateChapterContent, setToc, isSaving, updateChapterTitle, goHome } = useStore();
@@ -14,13 +24,25 @@ export const Editor: React.FC = () => {
     extensions: [
       StarterKit.configure({
         heading: {
-            levels: [1, 2, 3]
-        }
+            levels: [1, 2, 3, 4]
+        },
+        // 禁用 StarterKit 中的 CodeBlock，使用 CodeBlockLowlight 替代
+        codeBlock: false,
+      }),
+      Table.configure({
+        resizable: true,
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
+      CodeBlockLowlight.configure({
+        lowlight,
       }),
       Placeholder.configure({
         placeholder: "Type '/' for commands",
         emptyEditorClass: 'is-editor-empty',
       }),
+      MarkdownPaste.configure(),
     ],
     editorProps: {
       attributes: {
