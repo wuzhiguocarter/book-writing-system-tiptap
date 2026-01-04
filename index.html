@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BookCraft</title>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+              serif: ['Merriweather', 'ui-serif', 'Georgia', 'Cambria', 'Times New Roman', 'Times', 'serif'],
+            },
+            colors: {
+              notion: {
+                bg: '#FFFFFF',
+                sidebar: '#F7F7F5',
+                hover: '#EFEFED',
+                active: 'rgba(55, 53, 47, 0.08)',
+                text: '#37352F',
+                'text-light': 'rgba(55, 53, 47, 0.65)',
+                'text-lighter': 'rgba(55, 53, 47, 0.45)',
+                border: '#E9E9E7',
+              }
+            },
+            typography: (theme) => ({
+              DEFAULT: {
+                css: {
+                  maxWidth: '100%',
+                  color: '#37352F',
+                  fontFamily: theme('fontFamily.sans'),
+                  h1: { 
+                    fontWeight: '700',
+                    color: '#37352F',
+                    letterSpacing: '-0.02em',
+                  },
+                  h2: { 
+                    fontWeight: '600',
+                    color: '#37352F',
+                    letterSpacing: '-0.01em',
+                    marginTop: '1.4em',
+                  },
+                  h3: { 
+                    fontWeight: '600',
+                    color: '#37352F',
+                    marginTop: '1em',
+                  },
+                  p: {
+                    marginTop: '0.25em',
+                    marginBottom: '0.25em',
+                    lineHeight: '1.6',
+                  },
+                  'code::before': { content: '""' },
+                  'code::after': { content: '""' },
+                  code: {
+                    backgroundColor: 'rgba(135,131,120,0.15)',
+                    padding: '0.2em 0.4em',
+                    borderRadius: '3px',
+                    fontWeight: '400',
+                    color: '#EB5757',
+                  },
+                  blockquote: {
+                    borderLeftColor: '#37352F',
+                    fontStyle: 'normal',
+                    opacity: '0.8',
+                  }
+                },
+              },
+            }),
+          },
+        },
+        plugins: [
+          function({ addBase, theme }) {
+            addBase({
+              'body': { 
+                color: theme('colors.notion.text'), 
+                backgroundColor: theme('colors.notion.bg'),
+              },
+            })
+          }
+        ]
+      }
+    </script>
+    <style>
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(55, 53, 47, 0.16);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(55, 53, 47, 0.24);
+      }
+      
+      .ProseMirror {
+        outline: none;
+        min-height: 300px;
+        padding-bottom: 30vh;
+      }
+      .ProseMirror p.is-editor-empty:first-child::before {
+        color: rgba(55, 53, 47, 0.4);
+        content: attr(data-placeholder);
+        float: left;
+        height: 0;
+        pointer-events: none;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "zustand": "https://esm.sh/zustand@^5.0.9",
+    "dexie": "https://esm.sh/dexie@^4.2.1",
+    "@tiptap/extension-placeholder": "https://esm.sh/@tiptap/extension-placeholder@^3.14.0",
+    "@tiptap/react": "https://esm.sh/@tiptap/react@^3.14.0",
+    "@tiptap/starter-kit": "https://esm.sh/@tiptap/starter-kit@^3.14.0"
+  }
+}
+</script>
+</head>
+  <body class="antialiased overflow-hidden selection:bg-[#B4D5FE] selection:text-inherit">
+    <div id="root"></div>
+  </body>
+</html>
