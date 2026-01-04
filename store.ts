@@ -7,6 +7,7 @@ export const useStore = create<AppState>((set, get) => ({
   chapters: [],
   currentBook: null,
   currentChapter: null,
+  view: 'home',
   isLoading: true,
   isSaving: false,
   toc: [],
@@ -19,11 +20,6 @@ export const useStore = create<AppState>((set, get) => ({
       books.sort((a, b) => b.updatedAt - a.updatedAt);
       
       set({ books, isLoading: false });
-      
-      // If we have books but none selected, select the first one
-      if (books.length > 0 && !get().currentBook) {
-        get().selectBook(books[0]);
-      }
     } catch (error) {
       console.error("Failed to load data", error);
       set({ isLoading: false });
@@ -42,7 +38,10 @@ export const useStore = create<AppState>((set, get) => ({
     
     set(state => ({ 
       books: [bookWithId, ...state.books],
-      currentBook: bookWithId 
+      currentBook: bookWithId,
+      chapters: [],
+      currentChapter: null,
+      view: 'editor',
     }));
     
     // Create an initial chapter
@@ -77,6 +76,13 @@ export const useStore = create<AppState>((set, get) => ({
     const chapters = await db.chapters.where({ bookId: book.id! }).sortBy('order');
     set({ chapters, currentChapter: chapters.length > 0 ? chapters[0] : null, isLoading: false });
   },
+
+  openBook: async (book) => {
+    set({ view: 'editor' });
+    await get().selectBook(book);
+  },
+
+  goHome: () => set({ view: 'home' }),
 
   createChapter: async (bookId, title) => {
     const chapters = await db.chapters.where({ bookId }).toArray();

@@ -28,6 +28,7 @@ export interface AppState {
   chapters: Chapter[];
   currentBook: Book | null;
   currentChapter: Chapter | null;
+  view: 'home' | 'editor';
   isLoading: boolean;
   isSaving: boolean;
   toc: TocItem[];
@@ -37,6 +38,8 @@ export interface AppState {
   createBook: (title: string, description: string) => Promise<void>;
   deleteBook: (id: number) => Promise<void>;
   selectBook: (book: Book) => void;
+  openBook: (book: Book) => Promise<void>;
+  goHome: () => void;
   createChapter: (bookId: number, title: string) => Promise<void>;
   deleteChapter: (id: number) => Promise<void>;
   selectChapter: (chapter: Chapter) => void;

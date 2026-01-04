@@ -3,9 +3,10 @@ import { useStore } from './store';
 import { SidebarLeft } from './components/SidebarLeft';
 import { SidebarRight } from './components/SidebarRight';
 import { Editor } from './components/Editor';
+import { Home } from './components/Home';
 
 const App: React.FC = () => {
-  const { loadData, isLoading } = useStore();
+  const { loadData, isLoading, view } = useStore();
 
   useEffect(() => {
     loadData();
@@ -19,6 +20,10 @@ const App: React.FC = () => {
         </div>
       </div>
     );
+  }
+
+  if (view === 'home') {
+    return <Home />;
   }
 
   return (

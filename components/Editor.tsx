@@ -3,10 +3,10 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { useStore } from '../store';
-import { MoreHorizontal, Bold, Italic, Strikethrough, Heading1, Heading2, List, ListOrdered, Code, Quote } from 'lucide-react';
+import { MoreHorizontal, Bold, Italic, Strikethrough, Heading1, Heading2, List, ListOrdered, Code, Quote, ArrowLeft } from 'lucide-react';
 
 export const Editor: React.FC = () => {
-  const { currentChapter, updateChapterContent, setToc, isSaving, updateChapterTitle } = useStore();
+  const { currentChapter, updateChapterContent, setToc, isSaving, updateChapterTitle, goHome } = useStore();
   const isTypingRef = useRef(false);
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -93,7 +93,17 @@ export const Editor: React.FC = () => {
       {/* Top Header / Breadcrumb / Status */}
       <div className="h-11 px-4 flex items-center justify-between bg-white shrink-0 sticky top-0 z-10">
         <div className="flex items-center gap-2 text-sm text-notion-text overflow-hidden">
-            <span className="truncate max-w-[200px]">{currentChapter.title || "Untitled"}</span>
+            <button
+              type="button"
+              onClick={goHome}
+              className="inline-flex items-center gap-1 rounded px-1.5 py-1 text-notion-text-light hover:bg-notion-hover hover:text-notion-text"
+              title="返回书架"
+            >
+              <ArrowLeft size={16} />
+              <span className="text-xs">书架</span>
+            </button>
+            <div className="w-px h-4 bg-slate-200 mx-1" />
+            <span className="truncate max-w-[240px]">{currentChapter.title || "Untitled"}</span>
             {isSaving && <span className="text-[10px] text-notion-text-lighter uppercase tracking-wide">Saving...</span>}
         </div>
 
