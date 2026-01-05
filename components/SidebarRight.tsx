@@ -8,10 +8,11 @@ export const SidebarRight: React.FC = () => {
     const editorContainer = document.getElementById('editor-scroll-container');
     if (!editorContainer) return;
 
-    // Naive scroll to text
+    // Scroll to heading with normalized text comparison
     const headings = editorContainer.querySelectorAll('h1, h2, h3');
     for (let i = 0; i < headings.length; i++) {
-      if (headings[i].textContent === text) {
+      const headingText = headings[i].textContent?.trim() || '';
+      if (headingText === text.trim()) {
         headings[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
         break;
       }
@@ -35,10 +36,10 @@ export const SidebarRight: React.FC = () => {
               key={index}
               onClick={() => handleScrollTo(item.text)}
               className={`
-                text-[13px] cursor-pointer text-notion-text-light hover:bg-notion-hover hover:text-notion-text transition-colors rounded-sm py-1
-                ${item.level === 1 ? 'pl-2 font-medium' : ''}
-                ${item.level === 2 ? 'pl-5' : ''}
-                ${item.level === 3 ? 'pl-8' : ''}
+                text-[13px] cursor-pointer text-notion-text-light hover:bg-notion-hover hover:text-notion-text transition-colors rounded-sm py-1 px-2
+                ${item.level === 1 ? 'font-medium' : ''}
+                ${item.level === 2 ? 'pl-4' : ''}
+                ${item.level === 3 ? 'pl-7' : ''}
               `}
             >
               <div className="truncate">{item.text}</div>
