@@ -23,14 +23,16 @@ export const MarkdownPaste = Extension.create({
       new Plugin({
         props: {
           handlePaste: (view, event) => {
-            const text = event.clipboardData?.getData('text/plain');
+            const markdownClipboard = event.clipboardData?.getData('text/markdown');
+            const markdownText = markdownClipboard || event.clipboardData?.getData('text/plain');
+            const forceMarkdown = Boolean(markdownClipboard);
 
             // 检测是否为 Markdown 内容
-            if (text && isMarkdownContent(text)) {
+            if (markdownText && (forceMarkdown || isMarkdownContent(markdownText))) {
               event.preventDefault();
 
               // 将 Markdown 转换为 HTML
-              const html = markdownToHTML(text);
+              const html = markdownToHTML(markdownText);
 
               // 使用 ProseMirror 的 DOMParser 解析 HTML
               const { state, dispatch } = view;

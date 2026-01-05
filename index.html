@@ -336,6 +336,44 @@
         text-decoration: line-through;
         color: #9ca3af;
       }
+
+      /* Mermaid 渲染块 */
+      .mermaid-block {
+        background: #f8fafc;
+        border: 1px dashed #cbd5e1;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        margin: 1rem 0;
+      }
+
+      .mermaid-block.is-selected {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+      }
+
+      .mermaid-diagram {
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      .mermaid-diagram svg {
+        width: 100%;
+        height: auto;
+      }
+
+      .mermaid-caption {
+        margin-top: 0.5rem;
+        font-size: 12px;
+        color: #64748b;
+      }
+
+      .mermaid-error {
+        background: #fff1f2;
+        border-radius: 0.5rem;
+        color: #ef4444;
+        padding: 0.75rem;
+        white-space: pre-wrap;
+      }
     </style>
   <script type="importmap">
 {

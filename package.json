@@ -22,6 +22,8 @@
     "dexie": "^4.2.1",
     "lowlight": "^3.3.0",
     "lucide-react": "^0.562.0",
+    "marked": "^17.0.1",
+    "mermaid": "^11.12.2",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "vibe-kanban-web-companion": "^0.0.5",

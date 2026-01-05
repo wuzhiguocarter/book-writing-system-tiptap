@@ -11,6 +11,7 @@ import { common, createLowlight } from 'lowlight';
 import { useStore } from '../store';
 import { MoreHorizontal, Bold, Italic, Strikethrough, Heading1, Heading2, List, ListOrdered, Code, Quote, ArrowLeft } from 'lucide-react';
 import { MarkdownPaste } from '../extensions/MarkdownPaste';
+import { Mermaid } from '../extensions/Mermaid';
 
 // 创建 lowlight 实例，支持常用语言高亮
 const lowlight = createLowlight(common);
@@ -38,6 +39,7 @@ export const Editor: React.FC = () => {
       CodeBlockLowlight.configure({
         lowlight,
       }),
+      Mermaid,
       Placeholder.configure({
         placeholder: "Type '/' for commands",
         emptyEditorClass: 'is-editor-empty',
