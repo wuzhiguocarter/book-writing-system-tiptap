@@ -254,3 +254,58 @@
   height: 0;
   pointer-events: none;
 }
+
+/* ===== 可折叠标题样式 ===== */
+.ProseMirror h1.heading-with-collapse,
+.ProseMirror h2.heading-with-collapse,
+.ProseMirror h3.heading-with-collapse,
+.ProseMirror h4.heading-with-collapse {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.heading-collapse-button-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.heading-collapse-btn {
+  padding: 2px;
+  opacity: 0;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+  border-radius: 0.25rem;
+  color: currentColor;
+}
+
+.heading-collapse-btn:hover {
+  background-color: #e2e8f0;
+  opacity: 1 !important;
+}
+
+.heading-collapse-btn:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 1px;
+  opacity: 1 !important;
+}
+
+.ProseMirror h1:hover .heading-collapse-btn,
+.ProseMirror h2:hover .heading-collapse-btn,
+.ProseMirror h3:hover .heading-collapse-btn,
+.ProseMirror h4:hover .heading-collapse-btn {
+  opacity: 1;
+}
+
+.collapse-icon {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}

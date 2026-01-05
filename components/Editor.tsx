@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -9,16 +9,176 @@ import { TableHeader } from '@tiptap/extension-table-header';
 import { CodeBlockLowlight } from '@tiptap/extension-code-block-lowlight';
 import { common, createLowlight } from 'lowlight';
 import { useStore } from '../store';
-import { MoreHorizontal, Bold, Italic, Strikethrough, Heading1, Heading2, List, ListOrdered, Code, Quote, ArrowLeft } from 'lucide-react';
+import { MoreHorizontal, Bold, Italic, Strikethrough, Heading1, Heading2, List, ListOrdered, Code, Quote, ArrowLeft, ChevronDown } from 'lucide-react';
 import { MarkdownPaste } from '../extensions/MarkdownPaste';
 
 // 创建 lowlight 实例，支持常用语言高亮
 const lowlight = createLowlight(common);
 
 export const Editor: React.FC = () => {
-  const { currentChapter, updateChapterContent, setToc, isSaving, updateChapterTitle, goHome } = useStore();
+  const { currentChapter, updateChapterContent, setToc, isSaving, updateChapterTitle, goHome, toggleHeadingCollapse, isHeadingCollapsed, collapsedHeadings } = useStore();
   const isTypingRef = useRef(false);
   const editorRef = useRef<HTMLDivElement>(null);
+  const [headingIndices, setHeadingIndices] = useState<Map<string, number>>(new Map());
+
+  // Define helper functions before useEditor
+  const extractToc = (editorInstance: any) => {
+    const headings: any[] = [];
+    editorInstance.getJSON().content?.forEach((node: any) => {
+      if (node.type === 'heading') {
+        headings.push({
+          level: node.attrs?.level,
+          text: node.content?.[0]?.text || 'Untitled',
+          id: `heading-${headings.length}`
+        });
+      }
+    });
+    setToc(headings);
+  };
+
+  const generateHeadingId = (index: number): string => {
+    if (!currentChapter?.id) return '';
+    return `heading-${currentChapter.id}-${index}`;
+  };
+
+  const updateCollapsibleUI = () => {
+    const editorContainer = editorRef.current;
+    if (!editorContainer) return;
+
+    const headings = editorContainer.querySelectorAll('h1, h2, h3, h4');
+    const newIndices = new Map<string, number>();
+    
+    headings.forEach((heading, index) => {
+      const headingId = generateHeadingId(index);
+      newIndices.set(headingId, index);
+
+      // Add collapse button wrapper if not already present
+      if (!heading.classList.contains('heading-with-collapse')) {
+        heading.classList.add('heading-with-collapse');
+        
+        // Create and insert the collapse button
+        const buttonWrapper = document.createElement('div');
+        buttonWrapper.className = 'heading-collapse-button-wrapper';
+        buttonWrapper.style.display = 'inline-flex';
+        buttonWrapper.style.alignItems = 'center';
+        buttonWrapper.style.gap = '0.25rem';
+        
+        const collapseBtn = document.createElement('button');
+        collapseBtn.className = 'heading-collapse-btn';
+        collapseBtn.type = 'button';
+        collapseBtn.setAttribute('data-heading-id', headingId);
+        collapseBtn.style.padding = '2px';
+        collapseBtn.style.opacity = '0';
+        collapseBtn.style.cursor = 'pointer';
+        collapseBtn.style.border = 'none';
+        collapseBtn.style.background = 'transparent';
+        collapseBtn.style.display = 'inline-flex';
+        collapseBtn.style.alignItems = 'center';
+        collapseBtn.style.justifyContent = 'center';
+        collapseBtn.style.transition = 'opacity 0.15s ease';
+        
+        const icon = document.createElement('svg');
+        icon.className = 'collapse-icon';
+        icon.setAttribute('width', '16');
+        icon.setAttribute('height', '16');
+        icon.setAttribute('viewBox', '0 0 24 24');
+        icon.setAttribute('fill', 'none');
+        icon.setAttribute('stroke', 'currentColor');
+        icon.setAttribute('stroke-width', '2');
+        icon.setAttribute('stroke-linecap', 'round');
+        icon.setAttribute('stroke-linejoin', 'round');
+        icon.innerHTML = '<polyline points="6 9 12 15 18 9"></polyline>';
+        
+        collapseBtn.appendChild(icon);
+        collapseBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          toggleHeadingCollapse(headingId);
+        });
+
+        // Add hover effect to heading
+        heading.addEventListener('mouseenter', () => {
+          collapseBtn.style.opacity = '1';
+        });
+        heading.addEventListener('mouseleave', () => {
+          collapseBtn.style.opacity = '0';
+        });
+
+        buttonWrapper.appendChild(collapseBtn);
+        heading.insertBefore(buttonWrapper, heading.firstChild);
+      }
+
+      // Update button state
+      const btn = heading.querySelector(`[data-heading-id="${headingId}"]`) as HTMLButtonElement;
+      if (btn) {
+        const isCollapsed = isHeadingCollapsed(headingId);
+        const icon = btn.querySelector('.collapse-icon') as SVGElement;
+        if (icon && isCollapsed) {
+          icon.style.transform = 'rotate(-90deg)';
+        } else if (icon) {
+          icon.style.transform = 'rotate(0deg)';
+        }
+      }
+    });
+
+    setHeadingIndices(newIndices);
+    updateCollapsedContent();
+  };
+
+  const updateCollapsedContent = () => {
+    const editorContainer = editorRef.current;
+    if (!editorContainer) return;
+
+    const headings = editorContainer.querySelectorAll('h1, h2, h3, h4');
+    const headingElements: { element: Element; level: number; id: string }[] = [];
+
+    headings.forEach((heading, index) => {
+      const level = parseInt(heading.tagName[1]);
+      const headingId = generateHeadingId(index);
+      headingElements.push({ element: heading, level, id: headingId });
+    });
+
+    // Hide/show content based on collapsed state
+    headingElements.forEach((current, currentIndex) => {
+      const isCollapsed = isHeadingCollapsed(current.id);
+      
+      if (isCollapsed) {
+        // Find the next heading with same or higher level
+        let nextHeadingIndex = currentIndex + 1;
+        while (nextHeadingIndex < headingElements.length) {
+          if (headingElements[nextHeadingIndex].level <= current.level) {
+            break;
+          }
+          nextHeadingIndex++;
+        }
+
+        // Hide all content between current heading and next heading of same/higher level
+        let sibling = current.element.nextElementSibling;
+        while (sibling && (nextHeadingIndex >= headingElements.length || sibling !== headingElements[nextHeadingIndex].element)) {
+          if (sibling instanceof HTMLElement) {
+            sibling.style.display = 'none';
+          }
+          sibling = sibling?.nextElementSibling || null;
+        }
+      } else {
+        // Show all content until next heading of same level
+        let nextHeadingIndex = currentIndex + 1;
+        while (nextHeadingIndex < headingElements.length) {
+          if (headingElements[nextHeadingIndex].level <= current.level) {
+            break;
+          }
+          nextHeadingIndex++;
+        }
+
+        let sibling = current.element.nextElementSibling;
+        while (sibling && (nextHeadingIndex >= headingElements.length || sibling !== headingElements[nextHeadingIndex].element)) {
+          if (sibling instanceof HTMLElement) {
+            sibling.style.display = '';
+          }
+          sibling = sibling?.nextElementSibling || null;
+        }
+      }
+    });
+  };
 
   const editor = useEditor({
     extensions: [
@@ -56,25 +216,15 @@ export const Editor: React.FC = () => {
         updateChapterContent(currentChapter.id, html);
       }
       extractToc(editor);
+      // Update collapsible UI after content changes
+      setTimeout(() => {
+        updateCollapsibleUI();
+      }, 0);
     },
     onBlur: () => {
         isTypingRef.current = false;
     }
   });
-
-  const extractToc = (editorInstance: any) => {
-    const headings: any[] = [];
-    editorInstance.getJSON().content?.forEach((node: any) => {
-      if (node.type === 'heading') {
-        headings.push({
-          level: node.attrs?.level,
-          text: node.content?.[0]?.text || 'Untitled',
-          id: `heading-${headings.length}`
-        });
-      }
-    });
-    setToc(headings);
-  };
 
   useEffect(() => {
     if (editor && currentChapter) {
@@ -89,6 +239,22 @@ export const Editor: React.FC = () => {
       isTypingRef.current = false;
     }
   }, [currentChapter?.id, editor]);
+
+  // Update collapsible UI when content or chapter changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateCollapsibleUI();
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [currentChapter?.content]);
+
+  // Update collapsed content visibility when collapsedHeadings changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateCollapsedContent();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [collapsedHeadings]);
 
   if (!editor || !currentChapter) {
     return (

@@ -11,6 +11,7 @@ export const useStore = create<AppState>((set, get) => ({
   isLoading: true,
   isSaving: false,
   toc: [],
+  collapsedHeadings: new Set<string>(),
 
   loadData: async () => {
     set({ isLoading: true });
@@ -222,4 +223,20 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   setToc: (toc) => set({ toc }),
+
+  toggleHeadingCollapse: (headingId) => {
+    set(state => {
+      const newCollapsedHeadings = new Set(state.collapsedHeadings);
+      if (newCollapsedHeadings.has(headingId)) {
+        newCollapsedHeadings.delete(headingId);
+      } else {
+        newCollapsedHeadings.add(headingId);
+      }
+      return { collapsedHeadings: newCollapsedHeadings };
+    });
+  },
+
+  isHeadingCollapsed: (headingId) => {
+    return get().collapsedHeadings.has(headingId);
+  },
 }));

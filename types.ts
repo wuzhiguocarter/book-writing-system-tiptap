@@ -32,6 +32,7 @@ export interface AppState {
   isLoading: boolean;
   isSaving: boolean;
   toc: TocItem[];
+  collapsedHeadings: Set<string>; // Track collapsed headings by their ID (chapter-id-heading-index)
   
   // Actions
   loadData: () => Promise<void>;
@@ -47,4 +48,6 @@ export interface AppState {
   updateChapterTitle: (id: number, title: string) => Promise<void>;
   reorderChapter: (chapterId: number, targetId: number, position: 'before' | 'after' | 'inside') => Promise<void>;
   setToc: (toc: TocItem[]) => void;
+  toggleHeadingCollapse: (headingId: string) => void;
+  isHeadingCollapsed: (headingId: string) => boolean;
 }
