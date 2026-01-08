@@ -1,9 +1,13 @@
+"use client";
+
 import React, { useEffect, useRef } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
-import { useStore } from '../store';
+import { useStore } from '@/lib/store';
 import { MoreHorizontal, Bold, Italic, Strikethrough, Heading1, Heading2, List, ListOrdered, Code, Quote } from 'lucide-react';
+import { PDFExport } from '@/components/pdf/PDFExport';
+import { MarkdownExport } from '@/components/markdown/MarkdownExport';
 
 export const Editor: React.FC = () => {
   const { currentChapter, updateChapterContent, setToc, isSaving, updateChapterTitle } = useStore();
@@ -27,6 +31,7 @@ export const Editor: React.FC = () => {
         class: 'prose prose-slate prose-lg max-w-full focus:outline-none',
       },
     },
+    immediatelyRender: false, // 避免 SSR 水合不匹配
     onUpdate: ({ editor }) => {
       isTypingRef.current = true;
       const html = editor.getHTML();
@@ -56,8 +61,8 @@ export const Editor: React.FC = () => {
 
   useEffect(() => {
     if (editor && currentChapter) {
-      const isSameChapter = editor.getHTML() === currentChapter.content; 
-      
+      const isSameChapter = editor.getHTML() === currentChapter.content;
+
       if (!isTypingRef.current || !isSameChapter) {
          if (editor.getHTML() !== currentChapter.content) {
              editor.commands.setContent(currentChapter.content);
@@ -111,6 +116,12 @@ export const Editor: React.FC = () => {
                 <ToolbarButton onClick={() => editor.chain().focus().toggleCodeBlock().run()} isActive={editor.isActive('codeBlock')} icon={Code} title="Code Block" />
                 <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()} isActive={editor.isActive('blockquote')} icon={Quote} title="Quote" />
             </div>
+            <PDFExport title={currentChapter.title || "Untitled"} disabled={!currentChapter} />
+            <MarkdownExport
+              title={currentChapter.title || "Untitled"}
+              content={currentChapter?.content || ""}
+              disabled={!currentChapter}
+            />
             <button className="p-1 text-notion-text-light hover:text-notion-text hover:bg-notion-hover rounded">
                 <MoreHorizontal size={18} />
             </button>
@@ -118,25 +129,25 @@ export const Editor: React.FC = () => {
       </div>
 
       {/* Main Content Scroll Area */}
-      <div 
+      <div
         ref={editorRef}
         className="flex-1 overflow-y-auto w-full"
         id="editor-scroll-container"
       >
         <div className="max-w-[800px] mx-auto px-12 pb-32 pt-12">
              {/* Cover / Icon Placeholders could go here */}
-             
+
              {/* Title Input */}
              <div className="group relative mb-4">
-                 <input 
-                    type="text" 
+                 <input
+                    type="text"
                     value={currentChapter.title}
                     onChange={(e) => updateChapterTitle(currentChapter.id!, e.target.value)}
                     className="w-full text-4xl font-bold text-notion-text border-none focus:outline-none focus:ring-0 placeholder:text-gray-300 bg-transparent leading-tight py-2"
                     placeholder="Untitled"
                  />
              </div>
-             
+
              {/* Editor */}
              <EditorContent editor={editor} />
         </div>

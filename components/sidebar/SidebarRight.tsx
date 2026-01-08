@@ -1,5 +1,7 @@
+"use client";
+
 import React from 'react';
-import { useStore } from '../store';
+import { useStore } from '@/lib/store';
 
 export const SidebarRight: React.FC = () => {
   const { toc } = useStore();
@@ -27,11 +29,11 @@ export const SidebarRight: React.FC = () => {
       <div className="text-[11px] font-semibold text-notion-text-light uppercase tracking-wide mb-2 pl-2">
         In this page
       </div>
-      
-      <div className="flex-1 overflow-y-auto">
+
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
         <ul className="space-y-0.5">
           {toc.map((item, index) => (
-            <li 
+            <li
               key={index}
               onClick={() => handleScrollTo(item.text)}
               className={`

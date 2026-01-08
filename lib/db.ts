@@ -15,4 +15,18 @@ export class BookCraftDB extends Dexie {
   }
 }
 
-export const db = new BookCraftDB();
+// 延迟初始化，确保仅在客户端创建
+let dbInstance: BookCraftDB | null = null;
+
+export const getDb = () => {
+  if (typeof window === 'undefined') {
+    throw new Error('Dexie can only be used in the browser');
+  }
+  if (!dbInstance) {
+    dbInstance = new BookCraftDB();
+  }
+  return dbInstance;
+};
+
+// 向后兼容的导出
+export const db = typeof window !== 'undefined' ? new BookCraftDB() : (null as unknown as BookCraftDB);

@@ -1,5 +1,0 @@
-{
-  "name": "BookCraft",
-  "description": "A WYSIWYG book writing system with chapter management, real-time preview, and local persistence.",
-  "requestFramePermissions": []
-}
