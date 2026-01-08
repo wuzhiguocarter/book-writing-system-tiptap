@@ -1,22 +1,16 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from 'next'
+
+const nextConfig: NextConfig = {
   reactStrictMode: true,
 
-  // 实验性功能：启用 App Router
-  experimental: {
-    // 如需启用服务器组件，可以在这里配置
-  },
+  // Turbopack 配置（Next.js 16 默认构建工具，无需额外配置）
+  turbopack: {},
 
-  // Webpack 配置
-  webpack: (config: any) => {
-    // 处理 Dexie 和 IndexedDB
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      fs: false,
-    };
+  // 启用 React Compiler（稳定版，自动优化组件性能）
+  reactCompiler: true,
 
-    return config;
-  },
-};
+  // 启用 Cache Components（新的缓存模型）
+  cacheComponents: true,
+}
 
-export default nextConfig;
+export default nextConfig
