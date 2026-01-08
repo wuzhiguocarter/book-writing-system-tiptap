@@ -53,7 +53,7 @@ export function MarkdownExport({ title, content, disabled = false }: MarkdownExp
     <button
       onClick={handleExport}
       disabled={isExporting || disabled}
-      className="p-1 text-notion-text-light hover:text-notion-text hover:bg-notion-hover rounded disabled:opacity-50 disabled:cursor-not-allowed"
+      className="p-1 text-notion-text-light hover:text-notion-text hover:bg-notion-hover rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
       title="导出为 Markdown"
     >
       {isExporting ? (

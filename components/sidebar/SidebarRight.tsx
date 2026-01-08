@@ -37,7 +37,7 @@ export const SidebarRight: React.FC = () => {
               key={index}
               onClick={() => handleScrollTo(item.text)}
               className={`
-                text-[13px] cursor-pointer text-notion-text-light hover:bg-notion-hover hover:text-notion-text transition-colors rounded-sm py-1
+                text-[13px] cursor-pointer text-notion-text-light hover:bg-notion-hover hover:text-notion-text transition-colors rounded-xs py-1
                 ${item.level === 1 ? 'pl-2 font-medium' : ''}
                 ${item.level === 2 ? 'pl-5' : ''}
                 ${item.level === 3 ? 'pl-8' : ''}

@@ -28,7 +28,7 @@ export const Editor: React.FC = () => {
     ],
     editorProps: {
       attributes: {
-        class: 'prose prose-slate prose-lg max-w-full focus:outline-none',
+        class: 'prose prose-slate prose-lg max-w-full focus:outline-hidden',
       },
     },
     immediatelyRender: false, // 避免 SSR 水合不匹配
@@ -87,7 +87,7 @@ export const Editor: React.FC = () => {
     <button
       onClick={onClick}
       title={title}
-      className={`p-1 rounded transition-colors ${isActive ? 'text-blue-500' : 'text-notion-text-light hover:bg-notion-hover hover:text-notion-text'}`}
+      className={`p-1 rounded-sm transition-colors ${isActive ? 'text-blue-500' : 'text-notion-text-light hover:bg-notion-hover hover:text-notion-text'}`}
     >
       <Icon size={16} strokeWidth={2} />
     </button>
@@ -122,7 +122,7 @@ export const Editor: React.FC = () => {
               content={currentChapter?.content || ""}
               disabled={!currentChapter}
             />
-            <button className="p-1 text-notion-text-light hover:text-notion-text hover:bg-notion-hover rounded">
+            <button className="p-1 text-notion-text-light hover:text-notion-text hover:bg-notion-hover rounded-sm">
                 <MoreHorizontal size={18} />
             </button>
         </div>
@@ -143,7 +143,7 @@ export const Editor: React.FC = () => {
                     type="text"
                     value={currentChapter.title}
                     onChange={(e) => updateChapterTitle(currentChapter.id!, e.target.value)}
-                    className="w-full text-4xl font-bold text-notion-text border-none focus:outline-none focus:ring-0 placeholder:text-gray-300 bg-transparent leading-tight py-2"
+                    className="w-full text-4xl font-bold text-notion-text border-none focus:outline-hidden focus:ring-0 placeholder:text-gray-300 bg-transparent leading-tight py-2"
                     placeholder="Untitled"
                  />
              </div>

@@ -1,6 +1,96 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-serif: var(--font-merriweather), Georgia, serif;
+
+  --color-notion-bg: #ffffff;
+  --color-notion-sidebar: #f7f7f5;
+  --color-notion-hover: #efefed;
+  --color-notion-active: rgba(55, 53, 47, 0.08);
+  --color-notion-text: #37352f;
+  --color-notion-text-light: rgba(55, 53, 47, 0.65);
+  --color-notion-text-lighter: rgba(55, 53, 47, 0.45);
+  --color-notion-border: #e9e9e7;
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility prose {
+  /* Prose styles for editor */
+  @apply max-w-full text-notion-text;
+
+  & h1 {
+    @apply font-bold text-notion-text tracking-tight text-3xl mt-8 mb-4;
+  }
+
+  & h2 {
+    @apply font-semibold text-notion-text mt-6 mb-3 text-2xl;
+  }
+
+  & h3 {
+    @apply font-semibold text-notion-text mt-4 mb-2 text-xl;
+  }
+
+  & p {
+    @apply my-2 leading-relaxed;
+  }
+
+  & code {
+    @apply bg-[rgba(135,131,120,0.15)] px-1.5 py-0.5 rounded-sm text-[#EB5757] text-sm font-mono;
+  }
+
+  & pre {
+    @apply bg-gray-100 p-4 rounded-lg overflow-x-auto my-4;
+  }
+
+  & ul {
+    @apply my-2 pl-6;
+  }
+
+  & ol {
+    @apply my-2 pl-6;
+  }
+
+  & li {
+    @apply my-1;
+  }
+
+  & blockquote {
+    @apply border-l-4 border-gray-300 pl-4 italic my-4 text-notion-text-light;
+  }
+}
+
+@utility custom-scrollbar {
+  /* Custom scrollbar */
+  &::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    @apply bg-[rgba(55,53,47,0.16)] rounded-sm hover:bg-[rgba(55,53,47,0.24)];
+  }
+
+  &::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+}
 
 @layer base {
   :root {
@@ -69,66 +159,9 @@
   }
 }
 
-@layer components {
-  /* Prose styles for editor */
-  .prose {
-    @apply max-w-full text-notion-text;
-  }
-
-  .prose h1 {
-    @apply font-bold text-notion-text tracking-tight text-3xl mt-8 mb-4;
-  }
-
-  .prose h2 {
-    @apply font-semibold text-notion-text mt-6 mb-3 text-2xl;
-  }
-
-  .prose h3 {
-    @apply font-semibold text-notion-text mt-4 mb-2 text-xl;
-  }
-
-  .prose p {
-    @apply my-2 leading-relaxed;
-  }
-
-  .prose code {
-    @apply bg-[rgba(135,131,120,0.15)] px-1.5 py-0.5 rounded text-[#EB5757] text-sm font-mono;
-  }
-
-  .prose pre {
-    @apply bg-gray-100 p-4 rounded-lg overflow-x-auto my-4;
-  }
-
-  .prose ul,
-  .prose ol {
-    @apply my-2 pl-6;
-  }
-
-  .prose li {
-    @apply my-1;
-  }
-
-  .prose blockquote {
-    @apply border-l-4 border-gray-300 pl-4 italic my-4 text-notion-text-light;
-  }
-
-  /* Custom scrollbar */
-  .custom-scrollbar::-webkit-scrollbar {
-    @apply w-2 h-2;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-[rgba(55,53,47,0.16)] rounded hover:bg-[rgba(55,53,47,0.24)];
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-transparent;
-  }
-}
-
 /* TipTap Editor Styles */
 .ProseMirror {
-  @apply outline-none min-h-[300px] pb-[30vh];
+  @apply outline-hidden min-h-[300px] pb-[30vh];
 }
 
 .ProseMirror p.is-editor-empty:first-child::before {
@@ -137,5 +170,5 @@
 }
 
 .ProseMirror-selectednode {
-  @apply outline-none;
+  @apply outline-hidden;
 }

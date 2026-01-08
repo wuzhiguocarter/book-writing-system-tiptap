@@ -177,7 +177,7 @@ export const SidebarLeft: React.FC = () => {
         >
             {/* Expand Toggle */}
             <div
-              className={`w-5 h-5 flex items-center justify-center rounded hover:bg-slate-300/50 text-notion-text-lighter transition-transform ${hasChildren ? 'opacity-100' : 'opacity-0'}`}
+              className={`w-5 h-5 flex items-center justify-center rounded-sm hover:bg-slate-300/50 text-notion-text-lighter transition-transform ${hasChildren ? 'opacity-100' : 'opacity-0'}`}
               onClick={(e) => toggleExpand(e, node.id!)}
             >
                {isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
@@ -195,7 +195,7 @@ export const SidebarLeft: React.FC = () => {
             <div className={`opacity-0 group-hover:opacity-100 flex items-center ${currentChapter?.id === node.id ? 'opacity-100' : ''}`}>
                 <button
                   onClick={(e) => { e.stopPropagation(); if(confirm('Delete?')) deleteChapter(node.id!); }}
-                  className="text-notion-text-lighter hover:text-red-600 p-0.5 rounded"
+                  className="text-notion-text-lighter hover:text-red-600 p-0.5 rounded-sm"
                 >
                   <Trash2 size={13} />
                 </button>
@@ -249,7 +249,7 @@ export const SidebarLeft: React.FC = () => {
           className="flex items-center gap-2 p-1.5 rounded-md hover:bg-notion-hover cursor-pointer transition-colors"
           onClick={() => setShowBookList(!showBookList)}
         >
-           <div className="w-5 h-5 rounded bg-slate-700 text-white flex items-center justify-center text-[10px] font-bold">
+           <div className="w-5 h-5 rounded-sm bg-slate-700 text-white flex items-center justify-center text-[10px] font-bold">
               {currentBook ? currentBook.title.charAt(0).toUpperCase() : 'B'}
            </div>
            <div className="flex-1 min-w-0">
@@ -272,10 +272,10 @@ export const SidebarLeft: React.FC = () => {
                  <div
                    key={book.id}
                    onClick={() => { selectBook(book); setShowBookList(false); }}
-                   className="flex items-center justify-between px-2 py-1.5 rounded hover:bg-notion-hover cursor-pointer text-sm"
+                   className="flex items-center justify-between px-2 py-1.5 rounded-sm hover:bg-notion-hover cursor-pointer text-sm"
                  >
                     <div className="flex items-center gap-2 overflow-hidden">
-                        <span className="w-4 h-4 rounded-sm bg-slate-200 flex items-center justify-center text-[9px] text-slate-600">
+                        <span className="w-4 h-4 rounded-xs bg-slate-200 flex items-center justify-center text-[9px] text-slate-600">
                             {book.title.charAt(0).toUpperCase()}
                         </span>
                         <span className="truncate">{book.title}</span>
@@ -294,7 +294,7 @@ export const SidebarLeft: React.FC = () => {
                {!isCreatingBook ? (
                  <div
                     onClick={() => setIsCreatingBook(true)}
-                    className="flex items-center gap-2 px-2 py-1.5 mt-1 rounded hover:bg-notion-hover cursor-pointer text-sm text-notion-text-light"
+                    className="flex items-center gap-2 px-2 py-1.5 mt-1 rounded-sm hover:bg-notion-hover cursor-pointer text-sm text-notion-text-light"
                  >
                     <Plus size={14} /> <span>Create new book</span>
                  </div>
@@ -304,7 +304,7 @@ export const SidebarLeft: React.FC = () => {
                      autoFocus
                      type="text"
                      placeholder="Book Title"
-                     className="w-full text-sm p-1.5 bg-notion-hover border border-transparent focus:bg-white focus:border-blue-400 rounded outline-none"
+                     className="w-full text-sm p-1.5 bg-notion-hover border border-transparent focus:bg-white focus:border-blue-400 rounded-sm outline-hidden"
                      value={newBookTitle}
                      onChange={(e) => setNewBookTitle(e.target.value)}
                      onBlur={() => { if(!newBookTitle) setIsCreatingBook(false); }}
@@ -335,7 +335,7 @@ export const SidebarLeft: React.FC = () => {
 
             <div
                 onClick={handleCreateChapter}
-                className="flex items-center gap-2 px-2 py-1.5 mt-1 rounded hover:bg-notion-hover cursor-pointer text-sm text-notion-text-light group"
+                className="flex items-center gap-2 px-2 py-1.5 mt-1 rounded-sm hover:bg-notion-hover cursor-pointer text-sm text-notion-text-light group"
             >
                 <div className="flex items-center justify-center w-4 h-4 text-notion-text-lighter group-hover:text-notion-text">
                     <Plus size={14} />
@@ -349,7 +349,7 @@ export const SidebarLeft: React.FC = () => {
             <p className="mb-2">No book selected</p>
             <button
                 onClick={startCreatingBook}
-                className="text-xs bg-white px-3 py-1.5 rounded shadow-sm border border-notion-border text-notion-text hover:bg-notion-hover transition-colors"
+                className="text-xs bg-white px-3 py-1.5 rounded-sm shadow-xs border border-notion-border text-notion-text hover:bg-notion-hover transition-colors"
             >
                 Create a book
             </button>
@@ -359,7 +359,7 @@ export const SidebarLeft: React.FC = () => {
 
       {/* Bottom Actions */}
       <div className="p-3 border-t border-notion-border mt-auto">
-        <div className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-notion-hover cursor-pointer text-sm text-notion-text-light">
+        <div className="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-notion-hover cursor-pointer text-sm text-notion-text-light">
             <Settings size={15} />
             <span>Settings</span>
         </div>
