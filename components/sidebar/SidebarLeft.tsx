@@ -2,8 +2,9 @@
 
 import React, { useState, useMemo } from 'react';
 import { useStore } from '@/lib/store';
-import { Plus, Trash2, FileText, ChevronRight, ChevronDown, Book, Settings } from 'lucide-react';
+import { Plus, Trash2, FileText, ChevronRight, ChevronDown, Book, Settings, Upload } from 'lucide-react';
 import { Chapter } from '@/lib/types';
+import { MarkdownImport } from '@/components/markdown/MarkdownImport';
 
 interface TreeNode extends Chapter {
   children: TreeNode[];
@@ -21,7 +22,8 @@ export const SidebarLeft: React.FC = () => {
     createChapter,
     selectChapter,
     deleteChapter,
-    reorderChapter
+    reorderChapter,
+    importMultipleFiles
   } = useStore();
 
   const [isCreatingBook, setIsCreatingBook] = useState(false);
@@ -359,9 +361,15 @@ export const SidebarLeft: React.FC = () => {
 
       {/* Bottom Actions */}
       <div className="p-3 border-t border-notion-border mt-auto">
-        <div className="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-notion-hover cursor-pointer text-sm text-notion-text-light">
+        <div className="flex items-center gap-1">
+          <MarkdownImport
+            onImport={importMultipleFiles}
+            disabled={false}
+          />
+          <div className="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-notion-hover cursor-pointer text-sm text-notion-text-light flex-1">
             <Settings size={15} />
             <span>Settings</span>
+          </div>
         </div>
       </div>
     </div>

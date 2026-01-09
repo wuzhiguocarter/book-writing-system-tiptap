@@ -8,17 +8,62 @@ import { useStore } from '@/lib/store';
 import { MoreHorizontal, Bold, Italic, Strikethrough, Heading1, Heading2, List, ListOrdered, Code, Quote } from 'lucide-react';
 import { PDFExport } from '@/components/pdf/PDFExport';
 import { MarkdownExport } from '@/components/markdown/MarkdownExport';
+import useDebounce from '@/hooks/useDebounce';
+import { generateHeadingId } from '@/lib/utils/hash';
 
 export const Editor: React.FC = () => {
   const { currentChapter, updateChapterContent, setToc, isSaving, updateChapterTitle } = useStore();
   const isTypingRef = useRef(false);
   const editorRef = useRef<HTMLDivElement>(null);
 
+  // 创建防抖保存函数（1秒延迟）
+  const debouncedSave = useDebounce((html: string) => {
+    if (currentChapter?.id) {
+      updateChapterContent(currentChapter.id, html);
+    }
+  }, 1000);
+
+  // 创建防抖 TOC 提取函数（500毫秒延迟）
+  const debouncedExtractToc = useDebounce((editorInstance: any) => {
+    const headings: any[] = [];
+    const doc = editorInstance.state.doc;
+
+    // 遍历文档内容，提取标题
+    doc.descendants((node: any) => {
+      if (node.type.name === 'heading') {
+        const text = node.textContent || 'Untitled';
+        const level = node.attrs.level;
+        const uniqueId = generateHeadingId(text, level, headings.length);
+
+        headings.push({
+          id: uniqueId,
+          level,
+          text,
+        });
+      }
+    });
+
+    setToc(headings);
+
+    // 在渲染后为 DOM 中的标题元素添加 data-id
+    setTimeout(() => {
+      const editorContainer = document.getElementById('editor-scroll-container');
+      if (!editorContainer) return;
+
+      const headingElements = editorContainer.querySelectorAll('h1, h2, h3');
+      headingElements.forEach((element, index) => {
+        if (headings[index] && !element.getAttribute('data-id')) {
+          element.setAttribute('data-id', headings[index].id);
+        }
+      });
+    }, 100);
+  }, 500);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
         heading: {
-            levels: [1, 2, 3]
+          levels: [1, 2, 3]
         }
       }),
       Placeholder.configure({
@@ -35,28 +80,49 @@ export const Editor: React.FC = () => {
     onUpdate: ({ editor }) => {
       isTypingRef.current = true;
       const html = editor.getHTML();
-      if (currentChapter?.id) {
-        updateChapterContent(currentChapter.id, html);
-      }
-      extractToc(editor);
+      // 使用防抖保存
+      debouncedSave(html);
+      // 使用防抖 TOC 提取
+      debouncedExtractToc(editor);
     },
     onBlur: () => {
         isTypingRef.current = false;
     }
   });
 
+  // 非防抖版本的 TOC 提取（用于初始化）
   const extractToc = (editorInstance: any) => {
     const headings: any[] = [];
-    editorInstance.getJSON().content?.forEach((node: any) => {
-      if (node.type === 'heading') {
+    const doc = editorInstance.state.doc;
+
+    doc.descendants((node: any) => {
+      if (node.type.name === 'heading') {
+        const text = node.textContent || 'Untitled';
+        const level = node.attrs.level;
+        const uniqueId = generateHeadingId(text, level, headings.length);
+
         headings.push({
-          level: node.attrs?.level,
-          text: node.content?.[0]?.text || 'Untitled',
-          id: `heading-${headings.length}`
+          id: uniqueId,
+          level,
+          text,
         });
       }
     });
+
     setToc(headings);
+
+    // 在渲染后为 DOM 中的标题元素添加 data-id
+    setTimeout(() => {
+      const editorContainer = document.getElementById('editor-scroll-container');
+      if (!editorContainer) return;
+
+      const headingElements = editorContainer.querySelectorAll('h1, h2, h3');
+      headingElements.forEach((element, index) => {
+        if (headings[index] && !element.getAttribute('data-id')) {
+          element.setAttribute('data-id', headings[index].id);
+        }
+      });
+    }, 100);
   };
 
   useEffect(() => {

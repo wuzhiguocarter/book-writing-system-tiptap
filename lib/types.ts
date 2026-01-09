@@ -31,7 +31,7 @@ export interface AppState {
   isLoading: boolean;
   isSaving: boolean;
   toc: TocItem[];
-  
+
   // Actions
   loadData: () => Promise<void>;
   createBook: (title: string, description: string) => Promise<void>;
@@ -44,4 +44,6 @@ export interface AppState {
   updateChapterTitle: (id: number, title: string) => Promise<void>;
   reorderChapter: (chapterId: number, targetId: number, position: 'before' | 'after' | 'inside') => Promise<void>;
   setToc: (toc: TocItem[]) => void;
+  importMarkdown: (bookId: number, content: string) => Promise<void>;
+  importMultipleFiles: (files: File[]) => Promise<void>;
 }

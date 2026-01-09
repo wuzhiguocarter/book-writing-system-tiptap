@@ -2,22 +2,22 @@
 
 import React from 'react';
 import { useStore } from '@/lib/store';
+import { useActiveHeading } from '@/hooks/useActiveHeading';
 
 export const SidebarRight: React.FC = () => {
   const { toc } = useStore();
+  const activeId = useActiveHeading();
 
-  const handleScrollTo = (text: string) => {
-    const editorContainer = document.getElementById('editor-scroll-container');
-    if (!editorContainer) return;
+  const handleScrollTo = (itemId: string) => {
+    const element = document.querySelector(`[data-id="${itemId}"]`);
+    if (!element) return;
 
-    // Naive scroll to text
-    const headings = editorContainer.querySelectorAll('h1, h2, h3');
-    for (let i = 0; i < headings.length; i++) {
-      if (headings[i].textContent === text) {
-        headings[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
-        break;
-      }
-    }
+    // 使用 scrollIntoView 进行平滑滚动
+    element.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+      inline: 'nearest'
+    });
   };
 
   // If empty, we can hide it or show empty state. Notion doesn't show TOC unless you add a block.
@@ -34,11 +34,15 @@ export const SidebarRight: React.FC = () => {
         <ul className="space-y-0.5">
           {toc.map((item, index) => (
             <li
-              key={index}
-              onClick={() => handleScrollTo(item.text)}
+              key={item.id}
+              onClick={() => handleScrollTo(item.id)}
               className={`
-                text-[13px] cursor-pointer text-notion-text-light hover:bg-notion-hover hover:text-notion-text transition-colors rounded-xs py-1
-                ${item.level === 1 ? 'pl-2 font-medium' : ''}
+                text-[13px] cursor-pointer transition-colors rounded-xs py-1
+                ${activeId === item.id
+                  ? 'bg-blue-50 text-blue-600 font-medium'  // 活动标题样式
+                  : 'text-notion-text-light hover:bg-notion-hover hover:text-notion-text'
+                }
+                ${item.level === 1 ? 'pl-2' : ''}
                 ${item.level === 2 ? 'pl-5' : ''}
                 ${item.level === 3 ? 'pl-8' : ''}
               `}
