@@ -5,13 +5,13 @@ import { CollectionCard } from './CollectionCard';
 import { Hash, FolderPlus, Plus } from 'lucide-react';
 
 /**
- * 书架侧边栏组件
+ * 书架侧边栏组件（优化版）
  *
- * 功能：
- * - 显示文件夹列表
- * - 显示标签列表
- * - 支持创建文件夹和标签
- * - 支持按文件夹和标签筛选
+ * 改进点：
+ * - 优化"全部书籍"卡片样式
+ * - 增强标签列表交互效果
+ * - 提升按钮反馈
+ * - 优化空状态显示
  */
 export const BookshelfSidebar = () => {
   const {
@@ -80,7 +80,8 @@ export const BookshelfSidebar = () => {
           </h3>
           <button
             onClick={handleCreateCollection}
-            className="p-1 hover:bg-stone-100 rounded transition-colors"
+            className="p-1.5 hover:bg-stone-100 rounded-lg transition-all duration-200
+                     hover:shadow-sm active:scale-95"
             title="新建文件夹"
           >
             <FolderPlus size={16} className="text-stone-600" />
@@ -88,23 +89,27 @@ export const BookshelfSidebar = () => {
         </div>
 
         <div className="space-y-2">
-          {/* 全部书籍 */}
+          {/* 全部书籍（优化） */}
           <div
             onClick={() => handleSelectCollection(null)}
             className={`
-              p-3 rounded-lg cursor-pointer transition-colors
+              p-4 rounded-xl cursor-pointer transition-all duration-200
               ${!currentCollection
-                ? 'bg-stone-100 text-stone-800'
-                : 'hover:bg-stone-50 text-stone-600'
+                ? 'bg-stone-100/80 text-stone-800 shadow-sm border border-stone-200/60'
+                : 'hover:bg-stone-50/80 text-stone-600 hover:shadow-sm border-2 border-transparent hover:border-stone-200/60'
               }
             `}
           >
-            <div className="flex items-center gap-2">
-              <FolderPlus size={18} />
-              <span className="font-medium">全部书籍</span>
+            <div className="flex items-center gap-2.5 mb-1.5">
+              <div className={`p-1.5 rounded-lg transition-all duration-200 ${
+                !currentCollection ? 'bg-white shadow-sm' : 'bg-white/60'
+              }`}>
+                <FolderPlus size={18} />
+              </div>
+              <span className="font-semibold text-sm">全部书籍</span>
             </div>
-            <p className="text-xs text-stone-500 mt-1 ml-6">
-              {books.length} 本
+            <p className="text-xs text-stone-500/90 font-medium ml-9">
+              {books.length} 本书籍
             </p>
           </div>
 
@@ -129,18 +134,21 @@ export const BookshelfSidebar = () => {
           </h3>
           <button
             onClick={handleCreateTag}
-            className="p-1 hover:bg-stone-100 rounded transition-colors"
+            className="p-1.5 hover:bg-stone-100 rounded-lg transition-all duration-200
+                     hover:shadow-sm active:scale-95"
             title="新建标签"
           >
             <Plus size={16} className="text-stone-600" />
           </button>
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           {tags.length === 0 ? (
-            <p className="text-sm text-stone-500 text-center py-4">
-              暂无标签
-            </p>
+            <div className="text-center py-6 px-3">
+              <Hash size={24} className="mx-auto text-stone-300 mb-2" />
+              <p className="text-sm text-stone-500 font-medium">暂无标签</p>
+              <p className="text-xs text-stone-400 mt-1">点击 + 创建</p>
+            </div>
           ) : (
             tags.map(tag => {
               const isSelected = filterConfig.filterByTags?.includes(tag.name);
@@ -149,16 +157,30 @@ export const BookshelfSidebar = () => {
                   key={tag.id}
                   onClick={() => handleFilterByTag(tag.name)}
                   className={`
-                    w-full px-3 py-2 rounded-lg text-left transition-colors flex items-center gap-2
+                    w-full px-3.5 py-2.5 rounded-xl text-left
+                    transition-all duration-200
+                    flex items-center gap-2.5 group
                     ${isSelected
-                      ? 'bg-stone-100 text-stone-800'
-                      : 'hover:bg-stone-50 text-stone-600'
+                      ? 'bg-stone-100/80 text-stone-800 shadow-sm border border-stone-200/60'
+                      : 'hover:bg-stone-50/80 text-stone-600 hover:shadow-sm'
                     }
                   `}
                 >
-                  <Hash size={14} />
-                  <span className="flex-1 truncate">{tag.name}</span>
-                  <span className="text-xs text-stone-500">
+                  <div className={`p-1.5 rounded-lg transition-all duration-200 ${
+                    isSelected ? 'bg-white shadow-sm' : 'bg-white/60 group-hover:bg-white/80'
+                  }`}>
+                    <Hash size={12} className="text-stone-500" />
+                  </div>
+                  <span className="flex-1 truncate text-sm font-medium">
+                    {tag.name}
+                  </span>
+                  <span className={`
+                    text-xs px-2 py-0.5 rounded-full font-semibold
+                    ${isSelected
+                      ? 'bg-stone-200/80 text-stone-700'
+                      : 'bg-stone-200/50 text-stone-500'
+                    }
+                  `}>
                     {tagBookCounts[tag.name] || 0}
                   </span>
                 </button>

@@ -97,7 +97,7 @@ export const SearchBar: React.FC = () => {
 
       {/* 下拉面板：搜索建议 + 历史 */}
       {showSuggestions && hasContent && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-stone-200 overflow-hidden z-20">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl rounded-xl shadow-2xl border border-stone-200/60 overflow-hidden z-50">
           {/* 搜索建议 */}
           {searchSuggestions.length > 0 && (
             <div className="p-2">
@@ -153,7 +153,7 @@ export const SearchBar: React.FC = () => {
       {/* 点击外部关闭下拉面板 */}
       {showSuggestions && (
         <div
-          className="fixed inset-0 z-10"
+          className="fixed inset-0 z-40"
           onClick={() => setShowSuggestions(false)}
         />
       )}
