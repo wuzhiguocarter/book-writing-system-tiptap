@@ -172,3 +172,60 @@
 .ProseMirror-selectednode {
   @apply outline-hidden;
 }
+
+/* ========== 书架专用样式 ========== */
+
+/* 文本省略工具类 */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* 书架卡片动画 */
+@keyframes card-appear {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.book-card {
+  animation: card-appear 0.3s ease-out;
+}
+
+/* 自定义滚动条（书架专用） */
+.bookshelf-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.bookshelf-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.bookshelf-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.bookshelf-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* 平滑过渡 */
+.bookshelf-transition {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}

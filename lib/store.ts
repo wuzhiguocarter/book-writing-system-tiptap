@@ -1,8 +1,18 @@
 import { create } from 'zustand';
 import { db, getDb } from './db';
-import { AppState, Book, Chapter } from './types';
+import { AppState, Book, Chapter, EnhancedBook, Collection, Tag, SearchHistory, FilterConfig } from './types';
+
+// 默认筛选配置
+const defaultFilterConfig: FilterConfig = {
+  sortBy: 'updatedAt',
+  sortOrder: 'desc',
+  filterByTags: [],
+  filterByCollection: null,
+  timeRange: 'all',
+};
 
 export const useStore = create<AppState>((set, get) => ({
+  // 原有状态
   books: [],
   chapters: [],
   currentBook: null,
@@ -11,6 +21,16 @@ export const useStore = create<AppState>((set, get) => ({
   isSaving: false,
   toc: [],
 
+  // 书架新增状态
+  collections: [],
+  tags: [],
+  currentCollection: null,
+  searchQuery: '',
+  searchHistory: [],
+  searchSuggestions: [],
+  filterConfig: defaultFilterConfig,
+  viewMode: 'grid',
+
   loadData: async () => {
     // 客户端检查
     if (typeof window === 'undefined') return;
@@ -18,11 +38,23 @@ export const useStore = create<AppState>((set, get) => ({
     set({ isLoading: true });
     try {
       const database = getDb();
-      const books = await database.books.toArray();
+
+      // 并行加载所有数据
+      const [books, collections, tags] = await Promise.all([
+        database.books.toArray(),
+        database.collections.toArray(),
+        database.tags.toArray(),
+      ]);
+
       // Sort books by updated recently
       books.sort((a, b) => b.updatedAt - a.updatedAt);
 
-      set({ books, isLoading: false });
+      set({
+        books,
+        collections,
+        tags,
+        isLoading: false
+      });
 
       // If we have books but none selected, select the first one
       if (books.length > 0 && !get().currentBook) {
@@ -38,12 +70,24 @@ export const useStore = create<AppState>((set, get) => ({
     if (typeof window === 'undefined') return;
 
     const database = getDb();
-    const newBook: Book = {
+
+    // 生成随机封面颜色
+    const colors = ['#E8F4F8', '#FFF4E6', '#F0F8E8', '#F8F0E8', '#F8E8F4'];
+    const coverColor = colors[Math.floor(Math.random() * colors.length)];
+
+    const newBook: EnhancedBook = {
       title,
       description,
+      collectionId: null,
+      tags: [],
+      coverColor,
+      wordCount: 0,
+      lastReadAt: null,
+      isPinned: false,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
+
     const id = await database.books.add(newBook);
     const bookWithId = { ...newBook, id };
 
@@ -365,6 +409,385 @@ export const useStore = create<AppState>((set, get) => ({
         console.error(`Failed to import file: ${file.name}`, error);
       }
     }
+  },
+
+  // ========== 书架功能：文件夹操作 ==========
+
+  /**
+   * 加载所有文件夹
+   */
+  loadCollections: async () => {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const database = getDb();
+      const collections = await database.collections.toArray();
+      set({ collections });
+    } catch (error) {
+      console.error('Failed to load collections:', error);
+    }
+  },
+
+  /**
+   * 创建新文件夹
+   */
+  createCollection: async (name, color) => {
+    if (typeof window === 'undefined') return 0;
+
+    const database = getDb();
+    const collections = await database.collections.toArray();
+    const maxOrder = collections.length > 0 ? Math.max(...collections.map(c => c.order || 0)) : 0;
+
+    const newCollection: Collection = {
+      name,
+      color,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      order: maxOrder + 1,
+    };
+
+    const id = await database.collections.add(newCollection);
+    const collectionWithId = { ...newCollection, id };
+
+    set(state => ({
+      collections: [...state.collections, collectionWithId],
+    }));
+
+    return id as number;
+  },
+
+  /**
+   * 更新文件夹
+   */
+  updateCollection: async (id, updates) => {
+    if (typeof window === 'undefined') return;
+
+    const database = getDb();
+    await database.collections.update(id, { ...updates, updatedAt: Date.now() });
+
+    set(state => ({
+      collections: state.collections.map(collection =>
+        collection.id === id ? { ...collection, ...updates, updatedAt: Date.now() } : collection
+      ),
+    }));
+  },
+
+  /**
+   * 删除文件夹
+   * 删除文件夹后，该文件夹下的书籍会移到根目录
+   */
+  deleteCollection: async (id) => {
+    if (typeof window === 'undefined') return;
+
+    const database = getDb();
+
+    // 将该文件夹下的书籍移到根目录
+    await database.books.where({ collectionId: id }).modify({ collectionId: null });
+    await database.collections.delete(id);
+
+    set(state => ({
+      collections: state.collections.filter(collection => collection.id !== id),
+      books: state.books.map(book =>
+        book.collectionId === id ? { ...book, collectionId: null } : book
+      ),
+    }));
+  },
+
+  /**
+   * 选择文件夹（用于筛选）
+   */
+  selectCollection: (collection) => {
+    set({ currentCollection: collection });
+  },
+
+  // ========== 书架功能：标签操作 ==========
+
+  /**
+   * 加载所有标签
+   */
+  loadTags: async () => {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const database = getDb();
+      const tags = await database.tags.toArray();
+      set({ tags });
+    } catch (error) {
+      console.error('Failed to load tags:', error);
+    }
+  },
+
+  /**
+   * 创建新标签
+   */
+  createTag: async (name, color) => {
+    if (typeof window === 'undefined') return 0;
+
+    const database = getDb();
+    const newTag: Tag = {
+      name,
+      color,
+      usageCount: 0,
+      createdAt: Date.now(),
+    };
+
+    const id = await database.tags.add(newTag);
+    const tagWithId = { ...newTag, id };
+
+    set(state => ({
+      tags: [...state.tags, tagWithId],
+    }));
+
+    return id as number;
+  },
+
+  /**
+   * 更新标签
+   */
+  updateTag: async (id, updates) => {
+    if (typeof window === 'undefined') return;
+
+    const database = getDb();
+    await database.tags.update(id, updates);
+
+    set(state => ({
+      tags: state.tags.map(tag =>
+        tag.id === id ? { ...tag, ...updates } : tag
+      ),
+    }));
+  },
+
+  /**
+   * 删除标签
+   * 删除标签后，所有书籍中的该标签也会被移除
+   */
+  deleteTag: async (id) => {
+    if (typeof window === 'undefined') return;
+
+    const database = getDb();
+    const tag = await database.tags.get(id);
+    if (!tag) return;
+
+    // 从所有书籍中移除该标签
+    const books = await database.books.toArray();
+    for (const book of books) {
+      if (book.tags && book.tags.includes(tag.name)) {
+        const updatedTags = book.tags.filter(t => t !== tag.name);
+        await database.books.update(book.id!, { tags: updatedTags });
+      }
+    }
+
+    await database.tags.delete(id);
+
+    set(state => ({
+      tags: state.tags.filter(tag => tag.id !== id),
+      books: state.books.map(book => ({
+        ...book,
+        tags: book.tags ? book.tags.filter(t => t !== tag.name) : [],
+      })),
+    }));
+  },
+
+  /**
+   * 给书籍添加标签
+   */
+  addTagToBook: async (bookId, tagName) => {
+    const book = get().books.find(b => b.id === bookId) as EnhancedBook;
+    if (!book || !book.tags || book.tags.includes(tagName)) return;
+
+    const updatedTags = [...book.tags, tagName];
+    await get().updateBook(bookId, { tags: updatedTags });
+
+    // 更新标签使用次数
+    const tag = get().tags.find(t => t.name === tagName);
+    if (tag) {
+      await get().updateTag(tag.id!, { usageCount: tag.usageCount + 1 });
+    } else {
+      // 创建新标签
+      const colors = ['#E8F4F8', '#FFF4E6', '#F0F8E8', '#F8F0E8', '#F8E8F4'];
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      await get().createTag(tagName, color);
+    }
+  },
+
+  /**
+   * 从书籍移除标签
+   */
+  removeTagFromBook: async (bookId, tagName) => {
+    const book = get().books.find(b => b.id === bookId) as EnhancedBook;
+    if (!book || !book.tags) return;
+
+    const updatedTags = book.tags.filter(t => t !== tagName);
+    await get().updateBook(bookId, { tags: updatedTags });
+
+    // 更新标签使用次数
+    const tag = get().tags.find(t => t.name === tagName);
+    if (tag) {
+      await get().updateTag(tag.id!, { usageCount: Math.max(0, tag.usageCount - 1) });
+    }
+  },
+
+  // ========== 书架功能：搜索和筛选 ==========
+
+  /**
+   * 设置搜索查询
+   */
+  setSearchQuery: (query) => {
+    set({ searchQuery: query });
+    get().generateSearchSuggestions(query);
+
+    if (query.trim()) {
+      get().addToSearchHistory(query);
+    }
+  },
+
+  /**
+   * 添加搜索历史
+   */
+  addToSearchHistory: async (query) => {
+    if (typeof window === 'undefined') return;
+
+    const trimmedQuery = query.trim();
+    if (!trimmedQuery) return;
+
+    const database = getDb();
+
+    // 检查是否已存在
+    const existing = await database.searchHistory
+      .where('query')
+      .equals(trimmedQuery)
+      .first();
+
+    if (existing) {
+      await database.searchHistory.update(existing.id!, { timestamp: Date.now() });
+    } else {
+      await database.searchHistory.add({
+        query: trimmedQuery,
+        timestamp: Date.now(),
+      });
+    }
+
+    // 重新加载历史记录（保留最近 20 条）
+    const history = await database.searchHistory
+      .orderBy('timestamp')
+      .reverse()
+      .limit(20)
+      .toArray();
+
+    set({ searchHistory: history });
+  },
+
+  /**
+   * 清除搜索历史
+   */
+  clearSearchHistory: async () => {
+    if (typeof window === 'undefined') return;
+
+    const database = getDb();
+    await database.searchHistory.clear();
+    set({ searchHistory: [] });
+  },
+
+  /**
+   * 生成搜索建议
+   */
+  generateSearchSuggestions: async (query) => {
+    const trimmedQuery = query.trim().toLowerCase();
+    if (!trimmedQuery) {
+      set({ searchSuggestions: [] });
+      return;
+    }
+
+    const books = get().books as EnhancedBook[];
+    const collections = get().collections;
+    const tags = get().tags;
+
+    const suggestions = new Set<string>();
+
+    // 从书名中匹配
+    books.forEach(book => {
+      if (book.title.toLowerCase().includes(trimmedQuery)) {
+        suggestions.add(book.title);
+      }
+    });
+
+    // 从文件夹名称中匹配
+    collections.forEach(collection => {
+      if (collection.name.toLowerCase().includes(trimmedQuery)) {
+        suggestions.add(collection.name);
+      }
+    });
+
+    // 从标签名称中匹配
+    tags.forEach(tag => {
+      if (tag.name.toLowerCase().includes(trimmedQuery)) {
+        suggestions.add(tag.name);
+      }
+    });
+
+    set({ searchSuggestions: Array.from(suggestions).slice(0, 5) });
+  },
+
+  /**
+   * 更新筛选配置
+   */
+  updateFilterConfig: (config) => {
+    set(state => ({
+      filterConfig: { ...state.filterConfig, ...config },
+    }));
+  },
+
+  /**
+   * 设置视图模式
+   */
+  setViewMode: (mode) => {
+    set({ viewMode: mode });
+  },
+
+  // ========== 书架功能：书籍扩展操作 ==========
+
+  /**
+   * 更新书籍信息
+   */
+  updateBook: async (id, updates) => {
+    if (typeof window === 'undefined') return;
+
+    const database = getDb();
+    await database.books.update(id, { ...updates, updatedAt: Date.now() });
+
+    set(state => ({
+      books: state.books.map(book =>
+        book.id === id ? { ...book, ...updates, updatedAt: Date.now() } : book
+      ),
+    }));
+  },
+
+  /**
+   * 置顶/取消置顶书籍
+   */
+  pinBook: async (id, isPinned) => {
+    await get().updateBook(id, { isPinned });
+  },
+
+  /**
+   * 更新书籍字数统计
+   */
+  updateBookWordCount: async (id, wordCount) => {
+    await get().updateBook(id, { wordCount });
+  },
+
+  /**
+   * 更新书籍最后阅读时间
+   */
+  updateLastReadAt: async (id) => {
+    await get().updateBook(id, { lastReadAt: Date.now() });
+  },
+
+  /**
+   * 将书籍移到文件夹
+   */
+  moveBookToCollection: async (bookId, collectionId) => {
+    await get().updateBook(bookId, { collectionId });
   },
 }));
 

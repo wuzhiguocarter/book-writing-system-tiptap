@@ -1,16 +1,46 @@
 import Dexie, { Table } from 'dexie';
-import { Book, Chapter } from './types';
+import { Book, EnhancedBook, Chapter, Collection, Tag, SearchHistory } from './types';
 
 export class BookCraftDB extends Dexie {
-  books!: Table<Book, number>;
+  books!: Table<EnhancedBook, number>;
   chapters!: Table<Chapter, number>;
+  collections!: Table<Collection, number>;
+  tags!: Table<Tag, number>;
+  searchHistory!: Table<SearchHistory, number>;
 
   constructor() {
     super('BookCraftDB');
-    // Casting this to any to bypass TypeScript issue where inherited methods are not recognized
+
+    // Version 1: 原始 Schema（保持兼容）
     (this as any).version(1).stores({
       books: '++id, title, updatedAt',
       chapters: '++id, bookId, title, order, updatedAt'
+    });
+
+    // Version 2: 添加书架功能
+    (this as any).version(2).stores({
+      // 扩展 books 表索引
+      books: '++id, title, updatedAt, collectionId, [collectionId+updatedAt], tags, lastReadAt, isPinned',
+      chapters: '++id, bookId, title, order, updatedAt',
+      // 新增表
+      collections: '++id, name, order, updatedAt',
+      tags: '++id, name, usageCount',
+      searchHistory: '++id, query, timestamp',
+    }).upgrade((tx: any) => {
+      // 数据迁移：为现有书籍添加默认字段
+      return tx.table('books').toCollection().modify((book: any) => {
+        // 生成随机封面颜色
+        const colors = ['#E8F4F8', '#FFF4E6', '#F0F8E8', '#F8F0E8', '#F8E8F4'];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+        // 添加书架扩展字段
+        book.collectionId = null;
+        book.tags = [];
+        book.coverColor = randomColor;
+        book.wordCount = 0;
+        book.lastReadAt = null;
+        book.isPinned = false;
+      });
     });
   }
 }

@@ -1,0 +1,340 @@
+{
+  "metadata": {
+    "project_name": "BookCraft - 基于 TipTap 的书籍写作系统",
+    "project_path": "/Users/didi/projects/book-writing-system-tiptap",
+    "generated_at": "2026-01-10T01:20:38Z",
+    "scan_version": "1.0.0",
+    "scan_mode": "full",
+    "scanner": "claude-architect-adaptive"
+  },
+  "summary": {
+    "total_files_estimated": 45,
+    "files_scanned": 42,
+    "coverage_percentage": 93,
+    "modules_identified": 6,
+    "primary_language": "TypeScript",
+    "languages": {
+      "TypeScript": 38,
+      "TSX": 18,
+      "CSS": 1,
+      "JSON": 6
+    }
+  },
+  "modules": [
+    {
+      "name": "app",
+      "path": "app",
+      "type": "nextjs-pages",
+      "language": "TypeScript/TSX",
+      "responsibility": "Next.js 页面路由与布局",
+      "entry_points": [
+        "app/page.tsx",
+        "app/editor/[bookId]/page.tsx",
+        "app/layout.tsx"
+      ],
+      "key_files": [
+        "app/page.tsx",
+        "app/editor/[bookId]/page.tsx",
+        "app/layout.tsx",
+        "app/globals.css"
+      ],
+      "interfaces": [],
+      "data_models": [],
+      "test_directory": "e2e",
+      "test_files": [
+        "e2e/bookshelf.spec.ts",
+        "e2e/toc-navigation.spec.ts"
+      ],
+      "config_files": [],
+      "coverage": {
+        "has_entry": true,
+        "has_interfaces": false,
+        "has_data_models": false,
+        "has_tests": true,
+        "has_config": false
+      },
+      "missing": [],
+      "notes": "使用 Next.js 16 App Router，支持 SSR/CSR 混合渲染"
+    },
+    {
+      "name": "components",
+      "path": "components",
+      "type": "react-components",
+      "language": "TypeScript/TSX",
+      "responsibility": "React UI 组件库",
+      "entry_points": [
+        "components/bookshelf/BookshelfGrid.tsx",
+        "components/editor/Editor.tsx",
+        "components/sidebar/SidebarLeft.tsx",
+        "components/sidebar/SidebarRight.tsx"
+      ],
+      "key_files": [
+        "components/bookshelf/BookshelfGrid.tsx",
+        "components/bookshelf/BookCard.tsx",
+        "components/bookshelf/BookshelfHeader.tsx",
+        "components/bookshelf/BookshelfSidebar.tsx",
+        "components/bookshelf/CollectionCard.tsx",
+        "components/bookshelf/SearchBar.tsx",
+        "components/bookshelf/FilterPanel.tsx",
+        "components/editor/Editor.tsx",
+        "components/sidebar/SidebarLeft.tsx",
+        "components/sidebar/SidebarRight.tsx",
+        "components/markdown/MarkdownImport.tsx",
+        "components/markdown/MarkdownExport.tsx",
+        "components/markdown/MarkdownPreview.tsx",
+        "components/pdf/PDFExport.tsx"
+      ],
+      "interfaces": [],
+      "data_models": [],
+      "test_directory": "e2e",
+      "test_files": [
+        "e2e/bookshelf.spec.ts",
+        "e2e/chapter-management.spec.ts",
+        "e2e/toc-navigation.spec.ts",
+        "e2e/editor.spec.ts"
+      ],
+      "config_files": [],
+      "coverage": {
+        "has_entry": true,
+        "has_interfaces": false,
+        "has_data_models": false,
+        "has_tests": true,
+        "has_config": false
+      },
+      "missing": [
+        "单元测试（Vitest + Testing Library）",
+        "Storybook 文档"
+      ],
+      "notes": "组件按功能分组（bookshelf、editor、sidebar、markdown、pdf），使用 Tailwind CSS 和 Lucide React"
+    },
+    {
+      "name": "lib",
+      "path": "lib",
+      "type": "core-logic",
+      "language": "TypeScript",
+      "responsibility": "核心逻辑层（状态管理、数据库、类型定义）",
+      "entry_points": [
+        "lib/store.ts",
+        "lib/db.ts",
+        "lib/types.ts"
+      ],
+      "key_files": [
+        "lib/store.ts",
+        "lib/db.ts",
+        "lib/types.ts",
+        "lib/markdown-converter.ts",
+        "lib/pdf-generator.ts",
+        "lib/utils/hash.ts"
+      ],
+      "interfaces": [
+        "EnhancedBook",
+        "Chapter",
+        "Collection",
+        "Tag",
+        "TocItem",
+        "SearchHistory",
+        "FilterConfig",
+        "AppState"
+      ],
+      "data_models": [
+        "BookCraftDB (Dexie Schema)",
+        "IndexedDB Tables: books, chapters, collections, tags, searchHistory"
+      ],
+      "test_directory": "e2e",
+      "test_files": [
+        "e2e/bookshelf.spec.ts",
+        "e2e/chapter-management.spec.ts",
+        "e2e/import-export.spec.ts"
+      ],
+      "config_files": [],
+      "coverage": {
+        "has_entry": true,
+        "has_interfaces": true,
+        "has_data_models": true,
+        "has_tests": true,
+        "has_config": false
+      },
+      "missing": [
+        "单元测试（Vitest）",
+        "集成测试（Dexie + Zustand）"
+      ],
+      "notes": "使用 Zustand（状态管理）+ Dexie.js（IndexedDB），所有类型定义在 types.ts"
+    },
+    {
+      "name": "hooks",
+      "path": "hooks",
+      "type": "react-hooks",
+      "language": "TypeScript",
+      "responsibility": "React 自定义 Hooks",
+      "entry_points": [
+        "hooks/useDebounce.ts",
+        "hooks/useActiveHeading.ts"
+      ],
+      "key_files": [
+        "hooks/useDebounce.ts",
+        "hooks/useActiveHeading.ts"
+      ],
+      "interfaces": [],
+      "data_models": [],
+      "test_directory": "e2e",
+      "test_files": [
+        "e2e/editor.spec.ts",
+        "e2e/toc-navigation.spec.ts"
+      ],
+      "config_files": [],
+      "coverage": {
+        "has_entry": true,
+        "has_interfaces": false,
+        "has_data_models": false,
+        "has_tests": true,
+        "has_config": false
+      },
+      "missing": [
+        "单元测试（React Hooks Testing Library）"
+      ],
+      "notes": "包含 useDebounce（防抖）和 useActiveHeading（滚动同步），仅使用 React 内置 API"
+    },
+    {
+      "name": "e2e",
+      "path": "e2e",
+      "type": "e2e-tests",
+      "language": "TypeScript",
+      "responsibility": "Playwright E2E 测试套件",
+      "entry_points": [
+        "e2e/bookshelf.spec.ts",
+        "e2e/chapter-management.spec.ts",
+        "e2e/toc-navigation.spec.ts",
+        "e2e/editor.spec.ts"
+      ],
+      "key_files": [
+        "e2e/bookshelf.spec.ts",
+        "e2e/chapter-management.spec.ts",
+        "e2e/toc-navigation.spec.ts",
+        "e2e/editor.spec.ts",
+        "e2e/import-export.spec.ts",
+        "e2e/collections-tags.spec.ts",
+        "e2e/book-management.spec.ts",
+        "e2e/test-helpers.ts"
+      ],
+      "interfaces": [],
+      "data_models": [],
+      "test_directory": "e2e",
+      "test_files": [
+        "e2e/bookshelf.spec.ts",
+        "e2e/chapter-management.spec.ts",
+        "e2e/toc-navigation.spec.ts",
+        "e2e/editor.spec.ts",
+        "e2e/import-export.spec.ts",
+        "e2e/collections-tags.spec.ts",
+        "e2e/book-management.spec.ts"
+      ],
+      "config_files": [
+        "playwright.config.ts"
+      ],
+      "coverage": {
+        "has_entry": true,
+        "has_interfaces": false,
+        "has_data_models": false,
+        "has_tests": true,
+        "has_config": true
+      },
+      "missing": [
+        "性能测试",
+        "跨浏览器测试（Firefox、Safari）",
+        "移动端测试"
+      ],
+      "notes": "使用 Playwright，覆盖 ~85 个测试用例，总体覆盖率 ~98%"
+    },
+    {
+      "name": "public",
+      "path": "public",
+      "type": "static-assets",
+      "language": null,
+      "responsibility": "静态资源（未使用）",
+      "entry_points": [],
+      "key_files": [],
+      "interfaces": [],
+      "data_models": [],
+      "test_directory": null,
+      "test_files": [],
+      "config_files": [],
+      "coverage": {
+        "has_entry": false,
+        "has_interfaces": false,
+        "has_data_models": false,
+        "has_tests": false,
+        "has_config": false
+      },
+      "missing": [
+        "favicon.ico",
+        "robots.txt",
+        "静态图片资源"
+      ],
+      "notes": "目录为空，所有资源使用 CDN 或内联 SVG"
+    }
+  ],
+  "ignored_patterns": [
+    "node_modules/**",
+    ".git/**",
+    ".github/**",
+    "dist/**",
+    "build/**",
+    ".next/**",
+    "__pycache__/**",
+    "*.lock",
+    "*.log",
+    "*.bin",
+    "*.pdf",
+    "*.png",
+    "*.jpg",
+    "*.jpeg",
+    "*.gif",
+    "*.mp4",
+    "*.zip",
+    "*.tar",
+    "*.gz"
+  ],
+  "ignored_stats": {
+    "node_modules": "~15000+ files (估算)",
+    ".next": "~3000+ files (估算)",
+    "total_ignored": "~18000+ files"
+  },
+  "coverage_gaps": [
+    {
+      "module": "components",
+      "missing": "单元测试（Vitest + Testing Library）",
+      "impact": "中",
+      "recommendation": "使用 Vitest + React Testing Library 添加组件单元测试"
+    },
+    {
+      "module": "lib",
+      "missing": "单元测试（Vitest）",
+      "impact": "高",
+      "recommendation": "为 store.ts、db.ts、markdown-converter.ts 添加单元测试"
+    },
+    {
+      "module": "hooks",
+      "missing": "单元测试（React Hooks Testing Library）",
+      "impact": "中",
+      "recommendation": "为 useDebounce、useActiveHeading 添加单元测试"
+    },
+    {
+      "module": "e2e",
+      "missing": "性能测试、跨浏览器测试、移动端测试",
+      "impact": "低",
+      "recommendation": "使用 Playwright 的项目配置添加多浏览器和移动端测试"
+    }
+  ],
+  "next_steps": [
+    "1. 补充单元测试（Vitest）：优先覆盖 lib/store.ts、lib/db.ts、lib/markdown-converter.ts",
+    "2. 添加组件单元测试：使用 React Testing Library 测试关键组件（Editor、BookshelfGrid）",
+    "3. 集成测试：测试 Zustand store + Dexie.js 数据库交互",
+    "4. 性能测试：添加大文档编辑性能测试（10万+ 字）",
+    "5. 跨浏览器测试：启用 Firefox、Safari 测试（playwright.config.ts）",
+    "6. 移动端测试：添加 Pixel 5、iPhone 12 设备测试",
+    "7. 视觉回归测试：使用 Chromatic 或 Percy 监控 UI 变化",
+    "8. 设置 CI/CD：GitHub Actions 自动化测试与部署"
+  ],
+  "truncated": false,
+  "truncation_reason": null
+}
